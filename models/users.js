@@ -3,7 +3,7 @@ const Schema=mongoose.Schema;
 
 var user=new Schema({
     name:String,
-    emailid:String,
+    email_id:String,
     mobileno:Number,
     isAdmin:Boolean,
     password:String
