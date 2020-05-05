@@ -1,12 +1,13 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 var bodyParser = require('body-parser');
 
 var router = express.Router();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-
+app.use(cors());
 var db = require('./db');
 
 var logincontroller = require('./controllers/logincontroller');
