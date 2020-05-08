@@ -1,4 +1,4 @@
-
+const jwt = require('jsonwebtoken');
 var Users = require('../models/users');
 exports.login = function(req,res){
     var uname = req.body.username;
@@ -7,15 +7,31 @@ exports.login = function(req,res){
     Users.findOne({email_id : uname,password : pass},function(err,user){
         if(err){
             res.status(500).send({message:"Internal Server Error"});
-        }
-        if(user){
-            res.send({
-                name:user.name,
-                emailid:user.email_id,
-                isAdmin:user.isAdmin
-            });
         }else{
-            res.status(401).send({message:"Ivalid Username Or Password"});
-        }
+            if(user){
+                if(user.isAdmin){
+                    jwt.sign({user},'secretkey',(err,token)=>{
+                        res.send({
+                            name:user.name,
+                            email_id:user.email_id,
+                            isAdmin:user.isAdmin,
+                            token:token
+                        })
+                    })
+                
+                 }else{
+                    res.send({
+                        name:user.name,
+                        email_id:user.email_id,
+                        isAdmin:user.isAdmin,
+                    })
+                 }
+
+            }else{
+                res.status(404).send("User not found")
+            }
+           
+       
+    }
     });
 };
