@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
 
 var bodyParser = require('body-parser');
 
@@ -21,7 +20,7 @@ app.post('/announcements',verifyToken,postAnnouncement.announcement);
 app.get('/announcements',verifyToken,postAnnouncement.findAnnouncement);
 
 function verifyToken(req,res,next){
-    const barearHeader = req.headers['Authorization'];
+    const barearHeader = req.headers['authorization'];
 
     if(typeof barearHeader != 'undefined'){
 
@@ -34,7 +33,7 @@ function verifyToken(req,res,next){
         next();
 
     }else{
-        res.status(403);
+        res.sendStatus(403);
     }
 }
 
