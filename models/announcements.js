@@ -7,6 +7,7 @@ var announcement=new Schema({
     details:String,
     link:String,
     imageURL:String,
+    tags:[{type:String, ref:'Tags'}],
     date:Date
 
 });

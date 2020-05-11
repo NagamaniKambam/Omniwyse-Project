@@ -1,13 +1,15 @@
 var Announcement = require('../models/announcements');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 exports.announcement = function(req,res){
 
-    jwt.verify(req.token,'secretkey',(err,data)=>{
+    jwt.verify(req.token,'secretkey',(err,userdata)=>{
         if(err){
             res.sendStatus(403);
+            console.log(err);
         }else{
-            Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,imageURL:req.body.imageURL,date:Date()},function(err,data){
+            Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,imageURL : req.file.path,tags:req.body.tags,date:Date()},function(err,data){
                 if(err){
                     console.log(err);
                     res.status(500).send("Internal server error ")
@@ -32,6 +34,7 @@ exports.findAnnouncement = function(req,res){
                     console.log(err);
                     res.status(500).send("Internal Server Error");
                 }else{
+                    //const imgArray= data.image.map(element => element._id);
                     res.send(data);
         
                 }

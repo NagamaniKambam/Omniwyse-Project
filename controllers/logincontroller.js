@@ -10,8 +10,9 @@ exports.login = function(req,res){
         }else{
             if(user){
                 if(user.isAdmin){
-                    jwt.sign({user},'secretkey',(err,token)=>{
+                    jwt.sign({user},'secretkey',{expiresIn:'2h'},(err,token)=>{
                         res.send({
+                            id:user._id,
                             name:user.name,
                             email_id:user.email_id,
                             isAdmin:user.isAdmin,
