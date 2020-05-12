@@ -38,10 +38,7 @@ exports.announcement = function(req,res){
 }
 
 exports.findAnnouncement = function(req,res){
-    jwt.verify(req.token,'secretkey',(err,authdata)=>{
-        if(err){
-            res.sendStatus(403);
-        }else{
+  
             Announcement.find({}).sort({date:-1}).exec(function(err,data){
                 if(err){
                     console.log(err);
@@ -54,5 +51,3 @@ exports.findAnnouncement = function(req,res){
             });
 
         }
-    });
-}

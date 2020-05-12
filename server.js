@@ -12,6 +12,8 @@ app.use(express.static('uploads'))
 var db = require('./db');
 
 const multer = require('multer');
+
+// Filtering the image
 const fileFilter = (req,file,cb)=>{
     if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'image/png'){
         cb(null,true);
@@ -41,6 +43,8 @@ var logincontroller = require('./controllers/logincontroller');
 var findAllUsers = require('./controllers/usercontroller');
 var postAnnouncement = require('./controllers/announcement');
 
+// Routes
+
 app.post('/login',logincontroller.login);
 app.get('/users',verifyToken,findAllUsers.findAllUsers);
 app.post('/announcements',verifyToken, upload.single('image'),postAnnouncement.announcement);
@@ -56,6 +60,8 @@ app.get('/tags',function(req,res){
         }
     })
 })
+
+// function for verifying Token
 
 function verifyToken(req,res,next){
     const barearHeader = req.headers['authorization'];
