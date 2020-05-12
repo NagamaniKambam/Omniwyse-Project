@@ -22,6 +22,7 @@ exports.login = function(req,res){
                 
                  }else{
                     res.send({
+                        id:user._id,
                         name:user.name,
                         email_id:user.email_id,
                         isAdmin:user.isAdmin,

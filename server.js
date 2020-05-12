@@ -44,7 +44,7 @@ var postAnnouncement = require('./controllers/announcement');
 app.post('/login',logincontroller.login);
 app.get('/users',verifyToken,findAllUsers.findAllUsers);
 app.post('/announcements',verifyToken, upload.single('image'),postAnnouncement.announcement);
-app.get('/announcements',verifyToken,postAnnouncement.findAnnouncement);
+app.get('/announcements',postAnnouncement.findAnnouncement);
 
 
 app.get('/tags',function(req,res){
