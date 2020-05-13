@@ -10,7 +10,10 @@ exports.announcement = function(req,res){
             console.log(err);
         }else{
             if(req.file){
-                Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,imageURL : req.file.path,tags:req.body.tags,date:Date()},function(err,data){
+                var image = req.file.path;
+                var url = image.split('\\');
+                var imageurl = "http://localhost:3000/"+url[1]; 
+                Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,imageURL : imageurl,tags:req.body.tags,date:Date()},function(err,data){
                     if(err){
                         console.log(err);
                         res.status(500).send("Internal server error ")
