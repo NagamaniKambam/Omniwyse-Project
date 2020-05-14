@@ -54,3 +54,18 @@ exports.findAnnouncement = function(req,res){
             });
 
         }
+
+exports.findAnnouncemetById =  function(req,res){
+  
+    Announcement.findById(req.params.id,(function(err,data){
+        if(err){
+            console.log(err);
+            res.status(500).send("Internal Server Error");
+        }else{
+            //const imgArray= data.image.map(element => element._id);
+            res.send(data);
+
+        }
+    }));
+
+}
