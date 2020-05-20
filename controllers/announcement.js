@@ -1,6 +1,5 @@
 var Announcement = require('../models/announcements');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
 
 exports.announcement = function(req,res){
 
@@ -10,27 +9,64 @@ exports.announcement = function(req,res){
             console.log(err);
         }else{
             if(req.file){
-                var image = req.file.path;
-                var url = image.split('\\');
-                var imageurl = "http://localhost:3000/"+url[1]; 
-                Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,imageURL : imageurl,tags:req.body.tags,date:Date()},function(err,data){
-                    if(err){
-                        console.log(err);
-                        res.status(500).send("Internal server error ")
-                    }else{
-                        res.send(data);
-                    }
-                });
+                if(req.body.scheduledTime){
+                    var image = req.file.path;
+                    var url = image.split('\\');
+                    var imageurl = "http://localhost:3000/"+url[1]; 
+                    var tag = JSON.parse(req.body.tags);
+                    Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,imageURL : imageurl,tags:tag,date:req.body.scheduledTime,isScheduled:true},function(err,data){
+                        if(err){
+                            console.log(err);
+                            res.status(500).send("Internal server error ")
+                        }else{
+                            res.send(data);
+                        }
+                    });
+
+                }else{
+                    var image = req.file.path;
+                    var url = image.split('\\');
+                    var imageurl = "http://localhost:3000/"+url[1]; 
+                    var tag = JSON.parse(req.body.tags);
+                    console.log(req.body.scheduledTime);
+                    Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,imageURL : imageurl,tags:tag,date:Date(),isScheduled:false},function(err,data){
+                        if(err){
+                            console.log(err);
+                            res.status(500).send("Internal server error ")
+                        }else{
+                            res.send(data);
+                        }
+                    });
+
+                }
+               
 
             }else{
-                Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,tags:req.body.tags,date:Date()},function(err,data){
-                    if(err){
-                        console.log(err);
-                        res.status(500).send("Internal server error ")
-                    }else{
-                        res.send(data);
-                    }
-                });
+                if(req.body.scheduledTime){
+                    var tag = JSON.parse(req.body.tags);
+                    console.log(req.body.scheduledTime);
+                    Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,tags:tag,date:req.body.scheduledTime,isScheduled:true,imageURL:null},function(err,data){
+                        if(err){
+                            console.log(err);
+                            res.status(500).send("Internal server error ")
+                        }else{
+                            res.send(data);
+                        }
+                    });
+
+                }else{
+                    var tag = JSON.parse(req.body.tags);
+                    Announcement.insertMany({title:req.body.title,description:req.body.description,details: req.body.details,link:req.body.link,tags:tag,date:Date(),imageURL:null,isScheduled:false},function(err,data){
+                        if(err){
+                            console.log(err);
+                            res.status(500).send("Internal server error ")
+                        }else{
+                            res.send(data);
+                        }
+                    });
+
+                }
+               
             }
            
 
@@ -41,21 +77,35 @@ exports.announcement = function(req,res){
 }
 
 exports.findAnnouncement = function(req,res){
+    jwt.verify(req.token,'secretkey',(err,userdata)=>{
+        if(err){
+            res.sendStatus(403);
+            console.log(err);
+        }else{
+            var currentTime = new Date();
   
-            Announcement.find({}).sort({date:-1}).exec(function(err,data){
+            Announcement.find({$or:[{isScheduled:false},{date: { $lte: currentTime }}]}).sort({date:-1}).exec(function(err,data){
                 if(err){
                     console.log(err);
                     res.status(500).send("Internal Server Error");
                 }else{
-                    //const imgArray= data.image.map(element => element._id);
+
                     res.send(data);
         
                 }
             });
 
         }
+    })
+}
 
 exports.findAnnouncemetById =  function(req,res){
+    jwt.verify(req.token,'secretkey',(err,userdata)=>{
+        if(err){
+            res.sendStatus(403);
+            console.log(err);
+        }else{
+  
   
     Announcement.findById(req.params.id,(function(err,data){
         if(err){
@@ -67,5 +117,33 @@ exports.findAnnouncemetById =  function(req,res){
 
         }
     }));
+}
+    })
+
+}
+
+
+exports.findAnnouncemetByTags =  function(req,res){
+    jwt.verify(req.token,'secretkey',(err,userdata)=>{
+        if(err){
+            res.sendStatus(403);
+            console.log(err);
+        }else{
+            var tag = JSON.parse(req.params.tags);
+            var currentTime = new Date();
+            console.log(req.params.tags);
+            
+    Announcement.find({$and:[{tags:{$in : tag}},{$or:[{isScheduled:false},{date: { $lte: currentTime }}]}]}).sort({date:-1}).exec(function(err,data){
+        if(err){
+            console.log(err);
+            res.status(500).send("Internal Server Error");
+        }else{
+            //const imgArray= data.image.map(element => element._id);
+            res.send(data);
+
+        }
+    });
+}
+    })
 
 }

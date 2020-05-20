@@ -8,7 +8,8 @@ var announcement=new Schema({
     link:String,
     imageURL:String,
     tags:[{type:String, ref:'Tags'}],
-    date:Date
+    date:Date,
+    isScheduled:{type:Boolean,default:false}
 
 });
 module.exports = mongoose.model("Announcement",announcement);

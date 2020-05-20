@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const Tags = require('./models/tags');
 var bodyParser = require('body-parser');
 
 var router = express.Router();
@@ -42,25 +41,19 @@ var storage = multer.diskStorage({
 var logincontroller = require('./controllers/logincontroller');
 var findAllUsers = require('./controllers/usercontroller');
 var postAnnouncement = require('./controllers/announcement');
+var tagsController = require('./controllers/tagscontroller');
 
 // Routes
 
 app.post('/login',logincontroller.login);
 app.get('/users',verifyToken,findAllUsers.findAllUsers);
 app.post('/announcements',verifyToken, upload.single('image'),postAnnouncement.announcement);
-app.get('/announcements',postAnnouncement.findAnnouncement);
-app.get('/announcements/:id',postAnnouncement.findAnnouncemetById);
+app.get('/announcements',verifyToken,postAnnouncement.findAnnouncement);
+app.get('/announcements/:id',verifyToken,postAnnouncement.findAnnouncemetById);
 
+app.get('/getannouncementbytags/:tags',verifyToken,postAnnouncement.findAnnouncemetByTags)
 
-app.get('/tags',function(req,res){
-    Tags.find({},function(err,tags){
-        if(err){
-            res.sendStatus(403);
-        }else{
-            res.send(tags);
-        }
-    })
-})
+app.get('/userintags/:userid',verifyToken,tagsController.findUserInTags)
 
 // function for verifying Token
 

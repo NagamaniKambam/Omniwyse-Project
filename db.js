@@ -5,3 +5,6 @@ var db = mongoose.connect('mongodb://localhost/OmniwyseNotifications',{ useNewUr
 
 
 module.exports = db;
+
+
+

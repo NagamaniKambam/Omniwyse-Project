@@ -9,8 +9,7 @@ exports.login = function(req,res){
             res.status(500).send({message:"Internal Server Error"});
         }else{
             if(user){
-                if(user.isAdmin){
-                    jwt.sign({user},'secretkey',{expiresIn:'2h'},(err,token)=>{
+                    jwt.sign({user},'secretkey',{expiresIn:'4h'},(err,token)=>{
                         res.send({
                             id:user._id,
                             name:user.name,
@@ -19,15 +18,6 @@ exports.login = function(req,res){
                             token:token
                         })
                     })
-                
-                 }else{
-                    res.send({
-                        id:user._id,
-                        name:user.name,
-                        email_id:user.email_id,
-                        isAdmin:user.isAdmin,
-                    })
-                 }
 
             }else{
                 res.status(404).send("User not found")
