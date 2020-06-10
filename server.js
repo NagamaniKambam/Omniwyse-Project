@@ -2,9 +2,30 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 var bodyParser = require('body-parser');
+var swaggerUI = require('swagger-ui-express');
+var swaggerJsDoc = require('./node_modules/swagger-jsdoc');
+var webpush = require('web-push');
+var path = require('path');
+app.use(bodyParser.json());
+
+const swaggerOptions = {
+    swaggerDefinition:{
+        info:{
+            title:"Omniwyse Announcement API",
+            description:"Announcements can be send and receive through the API ",
+            contact:{
+                name:"Kalyan Kumar Reddy.K"
+            },
+            servers:["http://127.0.0.1:3000"]
+        }
+    },
+    apis:["server.js"]
+}
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(swaggerDocs));
 
 var router = express.Router();
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cors());
 app.use(express.static('uploads'))
@@ -42,6 +63,8 @@ var logincontroller = require('./controllers/logincontroller');
 var findAllUsers = require('./controllers/usercontroller');
 var postAnnouncement = require('./controllers/announcement');
 var tagsController = require('./controllers/tagscontroller');
+var deviceTokenController = require('./controllers/tokenController');
+var scheduledAnnouncementController = require('./controllers/scheduledAnnouncement');
 
 // Routes
 
@@ -54,7 +77,13 @@ app.get('/announcements/:id',verifyToken,postAnnouncement.findAnnouncemetById);
 app.get('/getannouncementbytags/:tags',verifyToken,postAnnouncement.findAnnouncemetByTags)
 
 app.get('/userintags/:userid',verifyToken,tagsController.findUserInTags)
+app.post('/devicetoken',deviceTokenController.deviceTokens);
+app.get('/devicetoken',deviceTokenController.getTokens);
 
+app.get('/scheduledannouncement',scheduledAnnouncementController.getScheduledAnnouncements);
+app.get('/scheduledannouncement/:id',scheduledAnnouncementController.findScheduledAnnouncementById);
+app.delete('/scheduledannouncement/:id',scheduledAnnouncementController.deleteScheduledAnnouncement);
+app.put('/scheduledannouncement/:id',scheduledAnnouncementController.updateScheduledAnnouncement);
 // function for verifying Token
 
 function verifyToken(req,res,next){
@@ -74,6 +103,52 @@ function verifyToken(req,res,next){
         res.sendStatus(403);
     }
 }
+
+<<<<<<< HEAD
+
+
+
+// for sending notifications
+
+var admin = require("firebase-admin");
+
+const notification_options = {
+    priority: "high",
+    timeToLive: 60 * 60 * 24
+  };
+
+
+var serviceAccount = require('./node_modules/firebase-admin/pushnotificationapp-ba212-firebase-adminsdk-d98g4-5cc471feb5.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://announcements-42d06.firebaseio.com"
+});
+
+app.post('/firebase/notification', (req, res)=>{
+    const  registrationTokens = req.body.token;
+    const message = req.body.payload;
+    const options =  notification_options
+    console.log(req.body.token);
+    console.log( req.body.payload);
+    
+      admin.messaging().sendToDevice(registrationTokens, message, options)
+      .then( response => {
+
+       res.status(200).send("Notification sent successfully")
+       
+      })
+      .catch( error => {
+          console.log(error);
+      });
+
+})
+=======
+// Scheduler for scheduled announcement
+>>>>>>> 0aa2bf157d148b228e5b192a6dc07a7c1c520b8a
+
+var scheduler = require('./scheduler');
+scheduler.scheduler()
 
 app.listen(3000,function(){
     console.log("API running at port 3000");
